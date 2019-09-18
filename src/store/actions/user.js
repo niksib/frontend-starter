@@ -1,0 +1,2 @@
+export const SET_USER_REQUEST = 'SET_USER_REQUEST';
+export const GET_USER_REQUEST = 'GET_USER_REQUEST';
