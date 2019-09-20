@@ -23,7 +23,7 @@
             <b-col md="4" class="middle-line p-0"></b-col>
           </b-col>
           <b-col md="12">
-            <b-form @click="authProvider('default')">
+            <b-form @submit.prevent="authProvider('default')">
               <b-form-group>
                 <b-form-input
                   v-model="form.email"
@@ -53,10 +53,10 @@
 
 <script>
 import { mapActions } from 'vuex';
-import { SOCIAL_LOGIN_REQUEST } from '../store/actions/auth';
+import { SOCIAL_LOGIN_REQUEST, DEFAULT_LOGIN_REQUEST } from '@/store/actions/auth';
 
 export default {
-  name: 'auth',
+  name: 'AuthSignIn',
   data() {
     return {
       form: {
@@ -72,19 +72,35 @@ export default {
   methods: {
     ...mapActions({
       socialLogin: SOCIAL_LOGIN_REQUEST,
+      defaultLogin: DEFAULT_LOGIN_REQUEST,
     }),
 
     authProvider(provider) {
-      this.$auth.authenticate(provider)
-        .then((socialToken) => {
-          this.socialLogin({ provider, socialToken }).then(() => {
+      if (provider === 'default') {
+        this.defaultLogin(this.form)
+          .then(() => {
             this.$router.push('/user-welcome');
+          })
+          .catch((err) => {
+            this.form.errors.status = true;
+            this.form.errors.message = err.message;
           });
-        })
-        .catch((err) => {
-          this.form.errors.status = true;
-          this.form.errors.message = err.message;
-        });
+      } else {
+        this.$auth.authenticate(provider)
+          .then((socialToken) => {
+            this.socialLogin({
+              provider,
+              socialToken,
+            })
+              .then(() => {
+                this.$router.push('/user-welcome');
+              });
+          })
+          .catch((err) => {
+            this.form.errors.status = true;
+            this.form.errors.message = err.message;
+          });
+      }
     },
   },
 };

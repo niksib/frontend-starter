@@ -1,8 +1,13 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import Home from './views/Home.vue';
-import Auth from './views/Auth.vue';
-import About from './views/About.vue';
+
+/** BASE ROUTES */
+import Home from '@/views/Home.vue';
+import About from '@/views/About.vue';
+
+/** AUTH ROUTES */
+import AuthSignIn from '@/views/auth/AuthSignIn.vue';
+import AuthSignUp from '@/views/auth/AuthSignUp.vue';
 
 Vue.use(Router);
 
@@ -22,9 +27,14 @@ export default new Router({
       meta: { requiresAuth: true },
     },
     {
-      path: '/auth',
-      name: 'auth',
-      component: Auth,
+      path: '/sign-in',
+      name: 'sign-in',
+      component: AuthSignIn,
+    },
+    {
+      path: '/sign-up',
+      name: 'sign-up',
+      component: AuthSignUp,
     },
   ],
 });

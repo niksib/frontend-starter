@@ -1,6 +1,11 @@
 import axios from 'axios';
 import {
-  AUTH_LOGOUT, AUTH_REFRESH, AUTH_SUCCESS, SOCIAL_LOGIN_REQUEST,
+  AUTH_LOGOUT,
+  AUTH_REFRESH,
+  AUTH_SET_TOKEN,
+  AUTH_SUCCESS,
+  DEFAULT_LOGIN_REQUEST,
+  SOCIAL_LOGIN_REQUEST,
 } from '../actions/auth';
 import { SET_USER_REQUEST } from '../actions/user';
 
@@ -10,6 +15,7 @@ const auth = {
   },
   mutations: {
     [AUTH_SUCCESS]: (state, token) => {
+      localStorage.setItem('user-token', token);
       state.token = token;
     },
     [AUTH_LOGOUT]: (state) => {
@@ -22,7 +28,24 @@ const auth = {
         axios.post(`/auth/social-login/${provider}`, socialToken)
           .then((resp) => {
             const { token } = resp.data;
-            localStorage.setItem('user-token', token);
+            commit(AUTH_SUCCESS, token);
+
+            dispatch(SET_USER_REQUEST);
+            resolve(resp);
+          })
+          .catch((err) => {
+            localStorage.removeItem('user-token');
+            reject(err);
+          });
+      })),
+    [DEFAULT_LOGIN_REQUEST]: ({ commit, dispatch }, { email, password }) => (
+      new Promise((resolve, reject) => {
+        axios.post('/auth/login', {
+          email,
+          password,
+        })
+          .then((resp) => {
+            const { token } = resp.data;
             commit(AUTH_SUCCESS, token);
 
             dispatch(SET_USER_REQUEST);
@@ -37,7 +60,6 @@ const auth = {
       axios.post('/auth/refresh')
         .then((resp) => {
           const { token } = resp.data;
-          localStorage.setItem('user-token', token);
           commit(AUTH_SUCCESS, token);
 
           dispatch(SET_USER_REQUEST);
@@ -64,6 +86,9 @@ const auth = {
           });
       }
     }),
+    [AUTH_SET_TOKEN]: ({ commit }, token) => {
+      commit(AUTH_SUCCESS, token);
+    },
   },
   getters: {
     isAuthenticated: state => !!state.token,

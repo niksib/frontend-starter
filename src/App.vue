@@ -11,10 +11,13 @@
             <template v-slot:button-content>
               <em>{{ user.email }}</em>
             </template>
-            <b-dropdown-item href="#">Profile</b-dropdown-item>
+            <b-dropdown-item to="/user-welcome">Profile</b-dropdown-item>
             <b-dropdown-item @click="logout">Sign Out</b-dropdown-item>
           </b-nav-item-dropdown>
-          <b-nav-item to="/auth" v-else>Login</b-nav-item>
+          <b-navbar-nav v-else>
+            <b-nav-item to="/sign-in">Sign In</b-nav-item>
+            <b-nav-item to="/sign-up">Sign Up</b-nav-item>
+          </b-navbar-nav>
         </b-navbar-nav>
       </b-collapse>
     </b-navbar>
@@ -61,7 +64,7 @@ export default {
     logout() {
       this.$store.dispatch(AUTH_LOGOUT)
         .then(() => {
-          this.$router.push('/auth');
+          this.$router.push('/sign-in');
         });
     },
   },

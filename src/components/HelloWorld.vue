@@ -5,10 +5,10 @@
     <ul>
       <li>Vue</li>
       <li>Vuex</li>
-      <li>Vue router</li>
+      <li>Vue Router</li>
+      <li>Vue Bootstrap</li>
       <li>JWT auth</li>
       <li>Social auth(Facebook, Twitter, Google)</li>
-      <li>Bootstrap 4</li>
     </ul>
     <p class="font-weight-bold">Happy coding :)</p>
   </div>
@@ -17,9 +17,6 @@
 <script>
 export default {
   name: 'HelloWorld',
-  props: {
-    msg: String,
-  },
 };
 </script>
 
