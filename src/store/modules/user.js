@@ -11,18 +11,19 @@ const user = {
     },
   },
   actions: {
-    [SET_USER_REQUEST]: ({ commit }) => {
+    [SET_USER_REQUEST]: ({ commit }) => new Promise((resolve, reject) => {
       axios.post('/auth/me')
         .then((resp) => {
           commit(SET_USER_REQUEST, resp.data);
+          resolve();
         })
         .catch((err) => {
-          throw err;
+          reject(err);
         });
-    },
+    }),
   },
   getters: {
-
+    getUserInfo: state => state.user,
   },
 };
 

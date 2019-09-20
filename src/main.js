@@ -2,6 +2,7 @@ import Vue from 'vue';
 
 import './plugins/axios';
 import './plugins/socialAuth';
+import './plugins/vueBootstrap';
 
 import App from './App.vue';
 import router from './router';
