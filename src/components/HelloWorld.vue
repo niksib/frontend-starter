@@ -7,6 +7,7 @@
       <li>Vuex</li>
       <li>Vue Router</li>
       <li>Vue Bootstrap</li>
+      <li>Vee validate</li>
       <li>JWT auth</li>
       <li>Social auth(Facebook, Twitter, Google)</li>
     </ul>

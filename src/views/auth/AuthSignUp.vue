@@ -23,35 +23,55 @@
             <b-col md="4" class="middle-line p-0"></b-col>
           </b-col>
           <b-col md="12">
-            <b-form @submit.prevent="register()">
-              <b-form-group>
-                <b-form-input
-                  v-model="form.email"
-                  type="email"
-                  required
-                  placeholder="Enter email"
-                ></b-form-input>
-              </b-form-group>
+            <ValidationObserver
+              ref="signUpForm"
+              v-slot="{ invalid }"
+              @submit.prevent="register()">
+              <b-form>
+                <b-form-group>
+                  <ValidationProvider name="email" rules="required|email" v-slot="{ errors }">
+                    <b-form-input
+                      v-model="form.email"
+                      type="email"
+                      name="email"
+                      placeholder="Enter email"
+                    ></b-form-input>
+                    <b-form-invalid-feedback :state="!errors[0]" class="text-left">
+                      {{ errors[0] }}
+                    </b-form-invalid-feedback>
+                  </ValidationProvider>
+                </b-form-group>
 
-              <b-form-group>
-                <b-form-input
-                  v-model="form.name"
-                  required
-                  placeholder="Enter name"
-                ></b-form-input>
-              </b-form-group>
+                <b-form-group>
+                  <ValidationProvider name="name" rules="required" v-slot="{ errors }">
+                    <b-form-input
+                      v-model="form.name"
+                      name="name"
+                      placeholder="Enter name"
+                    ></b-form-input>
+                    <b-form-invalid-feedback :state="!errors[0]" class="text-left">
+                      {{ errors[0] }}
+                    </b-form-invalid-feedback>
+                  </ValidationProvider>
+                </b-form-group>
 
-              <b-form-group>
-                <b-form-input
-                  type="password"
-                  v-model="form.password"
-                  required
-                  placeholder="Enter password"
-                ></b-form-input>
-              </b-form-group>
+                <b-form-group>
+                  <ValidationProvider name="password" rules="required|min:8" v-slot="{ errors }">
+                    <b-form-input
+                      type="password"
+                      v-model="form.password"
+                      name="password"
+                      placeholder="Enter password"
+                    ></b-form-input>
+                    <b-form-invalid-feedback :state="!errors[0]" class="text-left">
+                      {{ errors[0] }}
+                    </b-form-invalid-feedback>
+                  </ValidationProvider>
+                </b-form-group>
 
-              <button type="submit" class="btn btn-login mt-3">Sign up</button>
-            </b-form>
+                <button type="submit" class="btn btn-login mt-3">Sign up</button>
+              </b-form>
+            </ValidationObserver>
           </b-col>
         </div>
       </div>
@@ -61,11 +81,25 @@
 
 <script>
 import { mapActions } from 'vuex';
+import {
+  ValidationProvider, ValidationObserver, setInteractionMode, extend,
+} from 'vee-validate';
+import { required, email, min } from 'vee-validate/dist/rules';
 import { SOCIAL_LOGIN_REQUEST, AUTH_SET_TOKEN } from '@/store/actions/auth';
 import { SET_USER_REQUEST } from '@/store/actions/user';
 
+setInteractionMode('eager');
+
+extend('required', required);
+extend('email', email);
+extend('min', min);
+
 export default {
   name: 'AuthSignUp',
+  components: {
+    ValidationProvider,
+    ValidationObserver,
+  },
   data() {
     return {
       form: {
@@ -98,7 +132,13 @@ export default {
         });
     },
 
-    register() {
+    async register() {
+      const isValid = await this.$refs.signUpForm.validate();
+
+      if (!isValid) {
+        return;
+      }
+
       this.axios.post('/auth/register', this.form)
         .then((resp) => {
           this.$store.dispatch(AUTH_SET_TOKEN, resp.data.token);
