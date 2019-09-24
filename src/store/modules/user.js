@@ -14,8 +14,10 @@ const user = {
     [SET_USER_REQUEST]: ({ commit }) => new Promise((resolve, reject) => {
       axios.post('/auth/me')
         .then((resp) => {
-          commit(SET_USER_REQUEST, resp.data);
-          resolve();
+          if (resp) {
+            commit(SET_USER_REQUEST, resp.data);
+            resolve();
+          }
         })
         .catch((err) => {
           reject(err);

@@ -1,6 +1,6 @@
 <template xmlns:v-slot="http://www.w3.org/1999/XSL/Transform">
   <div id="app">
-    <b-navbar toggleable="lg" type="dark" variant="info" class="mb-4">
+    <b-navbar toggleable="lg" type="dark" variant="info">
       <b-navbar-brand to="/">Frontend starter</b-navbar-brand>
 
       <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
@@ -21,19 +21,28 @@
         </b-navbar-nav>
       </b-collapse>
     </b-navbar>
-    <router-view/>
+
+    <GlobalNotification/>
+
+    <div class="mt-4">
+      <router-view/>
+    </div>
   </div>
 </template>
 
 <script>
 import { mapActions, mapGetters } from 'vuex';
-import { AUTH_LOGOUT, AUTH_REFRESH } from './store/actions/auth';
-import { SET_USER_REQUEST } from './store/actions/user';
+import { AUTH_LOGOUT, AUTH_REFRESH } from '@/store/actions/auth';
+import { SET_USER_REQUEST } from '@/store/actions/user';
+import GlobalNotification from '@/components/GlobalNotification.vue';
 
 export default {
+  components: {
+    GlobalNotification,
+  },
   created() {
     if (this.isAuthenticated) {
-      this.getUser()
+      this.setUser()
         .catch((err) => {
           if (err.response.data.error) {
             switch (err.response.data.error) {
@@ -58,7 +67,7 @@ export default {
   },
   methods: {
     ...mapActions({
-      getUser: SET_USER_REQUEST,
+      setUser: SET_USER_REQUEST,
       refreshToken: AUTH_REFRESH,
     }),
     logout() {

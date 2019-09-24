@@ -4,6 +4,7 @@ import Router from 'vue-router';
 /** BASE ROUTES */
 import Home from '@/views/Home.vue';
 import About from '@/views/About.vue';
+import PageNotFound from '@/views/PageNotFound.vue';
 
 /** AUTH ROUTES */
 import AuthSignIn from '@/views/auth/AuthSignIn.vue';
@@ -35,6 +36,10 @@ export default new Router({
       path: '/sign-up',
       name: 'sign-up',
       component: AuthSignUp,
+    },
+    {
+      path: '*',
+      component: PageNotFound,
     },
   ],
 });

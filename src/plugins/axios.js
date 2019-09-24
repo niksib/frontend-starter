@@ -1,6 +1,8 @@
 import Vue from 'vue';
 import VueAxios from 'vue-axios';
 import axios from 'axios';
+import store from '@/store/store';
+import { SET_NOTIFICATION } from '../store/actions/notification';
 
 Vue.use(VueAxios, axios);
 
@@ -22,6 +24,13 @@ Vue.axios.interceptors.request.use((config) => {
 });
 
 Vue.axios.interceptors.response.use(response => response, (err) => {
+  const notification = {
+    type: 'danger',
+    message: err.response.data.error,
+  };
+
+  store.commit(SET_NOTIFICATION, notification);
+
   throw err;
   // TODO handle token expire and unauthorized
 });
