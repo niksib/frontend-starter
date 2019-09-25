@@ -1,3 +1,10 @@
 {
-  "alias": ["frontend-starter"]
+  "alias": ["frontend-starter"],
+  "build": {
+    "env": {
+      "VUE_APP_URL": "@frontend-starter-app-url",
+      "VUE_APP_API_URL": "@frontend-starter-api-url",
+      "VUE_APP_FACEBOOK_CLIENT_ID": "@frontend-starter-facebook-client-id"
+    }
+  }
 }
