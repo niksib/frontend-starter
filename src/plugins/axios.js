@@ -7,7 +7,7 @@ import { AUTH_LOGOUT, AUTH_REFRESH } from '../store/actions/auth';
 
 Vue.use(VueAxios, axios);
 
-Vue.axios.defaults.baseURL = 'http://simple-poll.localhost:5600/api/';
+Vue.axios.defaults.baseURL = process.env.VUE_APP_API_URL;
 
 Vue.axios.defaults.headers = {
   'Access-Control-Allow-Origin': '*',
