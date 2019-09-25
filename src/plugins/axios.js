@@ -3,6 +3,7 @@ import VueAxios from 'vue-axios';
 import axios from 'axios';
 import store from '@/store/store';
 import { SET_NOTIFICATION } from '../store/actions/notification';
+import { AUTH_LOGOUT, AUTH_REFRESH } from '../store/actions/auth';
 
 Vue.use(VueAxios, axios);
 
@@ -24,13 +25,26 @@ Vue.axios.interceptors.request.use((config) => {
 });
 
 Vue.axios.interceptors.response.use(response => response, (err) => {
+  const STATUS_UNAUTHORIZED = 401;
   const notification = {
     type: 'danger',
     message: err.response.data.error,
   };
 
-  store.commit(SET_NOTIFICATION, notification);
+  if (err.response.status === STATUS_UNAUTHORIZED && err.response.data.error) {
+    switch (err.response.data.error) {
+      case 'TOKEN_EXPIRED':
+        store.dispatch(AUTH_REFRESH);
+        break;
+      case 'TOKEN_INVALID':
+        store.dispatch(AUTH_LOGOUT, true);
+        break;
+      default:
+        break;
+    }
+  } else {
+    store.dispatch(SET_NOTIFICATION, notification);
+  }
 
   throw err;
-  // TODO handle token expire and unauthorized
 });

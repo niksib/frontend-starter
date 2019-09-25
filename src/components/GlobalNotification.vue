@@ -3,7 +3,10 @@
     <div class="global-notifications__item"
          v-for="(notification, index) in notifications"
          :key="index">
-      <b-alert show dismissible :variant="notification.type">
+      <b-alert show
+               dismissible
+               :variant="notification.type"
+               @dismissed="removeNotification(index)">
         {{ notification.message }}
       </b-alert>
     </div>
@@ -11,13 +14,19 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapActions, mapGetters } from 'vuex';
+import { REMOVE_NOTIFICATION } from '../store/actions/notification';
 
 export default {
   name: 'GlobalNotification',
   computed: {
     ...mapGetters({
       notifications: 'getNotifications',
+    }),
+  },
+  methods: {
+    ...mapActions({
+      removeNotification: REMOVE_NOTIFICATION,
     }),
   },
 };

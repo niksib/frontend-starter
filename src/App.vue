@@ -32,7 +32,7 @@
 
 <script>
 import { mapActions, mapGetters } from 'vuex';
-import { AUTH_LOGOUT, AUTH_REFRESH } from '@/store/actions/auth';
+import { AUTH_LOGOUT } from '@/store/actions/auth';
 import { SET_USER_REQUEST } from '@/store/actions/user';
 import GlobalNotification from '@/components/GlobalNotification.vue';
 
@@ -42,21 +42,7 @@ export default {
   },
   created() {
     if (this.isAuthenticated) {
-      this.setUser()
-        .catch((err) => {
-          if (err.response.data.error) {
-            switch (err.response.data.error) {
-              case 'TOKEN_EXPIRED':
-                this.refreshToken();
-                break;
-              case 'TOKEN_INVALID':
-                this.$store.dispatch(AUTH_LOGOUT, true);
-                break;
-              default:
-                break;
-            }
-          }
-        });
+      this.setUser();
     }
   },
   computed: {
@@ -68,7 +54,6 @@ export default {
   methods: {
     ...mapActions({
       setUser: SET_USER_REQUEST,
-      refreshToken: AUTH_REFRESH,
     }),
     logout() {
       this.$store.dispatch(AUTH_LOGOUT)
