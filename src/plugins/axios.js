@@ -5,6 +5,17 @@ import store from '@/store/store';
 import { SET_NOTIFICATION } from '../store/actions/notification';
 import { AUTH_LOGOUT, AUTH_REFRESH } from '../store/actions/auth';
 
+let isRefreshing = false;
+let refreshSubscribers = [];
+
+function subscribeTokenRefresh(cb) {
+  refreshSubscribers.push(cb);
+}
+
+function onRefreshed(token) {
+  refreshSubscribers.map(cb => cb(token));
+}
+
 Vue.use(VueAxios, axios);
 
 Vue.axios.defaults.baseURL = process.env.VUE_APP_API_URL;
@@ -16,9 +27,10 @@ Vue.axios.defaults.headers = {
 
 Vue.axios.interceptors.request.use((config) => {
   // Do something before request is sent
-  if (localStorage.getItem('user-token')) {
+  const userToken = localStorage.getItem('user-token');
+  if (userToken) {
     // eslint-disable-next-line no-param-reassign
-    config.headers.Authorization = `Bearer ${localStorage.getItem('user-token')}`;
+    config.headers.Authorization = `Bearer ${userToken}`;
   }
 
   return config;
@@ -31,15 +43,31 @@ Vue.axios.interceptors.response.use(response => response, (err) => {
     message: err.response.data.error,
   };
 
-  if (err.response.status === STATUS_UNAUTHORIZED && err.response.data.error) {
+  if (err.response.status === STATUS_UNAUTHORIZED) {
     switch (err.response.data.error) {
       case 'TOKEN_EXPIRED':
-        store.dispatch(AUTH_REFRESH);
+        if (!isRefreshing) {
+          isRefreshing = true;
+          store.dispatch(AUTH_REFRESH).then((token) => {
+            isRefreshing = false;
+            onRefreshed(token);
+            refreshSubscribers = [];
+          });
+        }
+
+        return new Promise((resolve) => {
+          subscribeTokenRefresh((token) => {
+            err.config.headers.Authorization = `Bearer ${token}`;
+            resolve(Vue.axios(err.config));
+          });
+        });
+      case 'BAD_CREDENTIALS':
         break;
       case 'TOKEN_INVALID':
-        store.dispatch(AUTH_LOGOUT, true);
-        break;
+      case 'TOKEN_BLACKLISTED':
       default:
+        store.dispatch(AUTH_LOGOUT, true);
+        window.location.href = '/sign-in';
         break;
     }
   } else {
